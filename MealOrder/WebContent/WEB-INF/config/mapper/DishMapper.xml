@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jason.mealorder.mapper.DishMapper">
+	<resultMap id="dishResultMap" type="Dish">	
+		<result property="dishName" column="dishName" />
+		<result property="imgSrc" column="imgSrc" />
+		<result property="attribution" column="attribution" />	
+		<result property="price" column="price" />	
+	</resultMap>
+	 <insert id="addDish" parameterType="Dish" useGeneratedKeys="true" keyProperty="id">
+        insert into dish (dishName,imgSrc,attribution,price) 
+        values(#{imgSrc},#{imgSrc},#{attribution},#{price})
+    </insert>
+	
+	<select id="getDish"  parameterType="String" resultMap="dishResultMap">
+		select * from dish WHERE attribution=#{0} AND imgSrc=#{1}
+	</select>
+	
+	<select id="getImgSrc"  parameterType="String" resultMap="dishResultMap">
+		select * from dish WHERE attribution=#{0} AND dishName=#{1}
+	</select>	
+</mapper>

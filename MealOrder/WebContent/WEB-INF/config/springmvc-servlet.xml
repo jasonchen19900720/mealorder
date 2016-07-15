@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+       <!--配置扫面类包-->
+        <context:component-scan base-package="com.jason.mealorder.controller"></context:component-scan>
+
+       <!--配置spring注解驱动-->
+       <mvc:annotation-driven>
+              <!-- 消息转换器 -->
+              <mvc:message-converters register-defaults="true">
+                     <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                            <property name="supportedMediaTypes" value="text/html;charset=UTF-8"/>
+                     </bean>
+              </mvc:message-converters>
+       </mvc:annotation-driven>
+
+       <!--配置视图解析器-->
+       <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+              <property name="prefix" value="/WEB-INF/jsp/"></property>
+              <property name="suffix" value=".jsp"></property>
+       </bean>
+
+       <!--JSR303验证切面-->
+       <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+       <bean id="jsrValidationAdvice" class="com.jason.mealorder.common.JSRValidationAdvice" />
+       <aop:config>
+              <aop:pointcut id="jsrValidate" expression="execution(public * com.jason.mealorder.controller.*.*(..))"/>
+              <aop:aspect id="jsrValidationAspect" ref="jsrValidationAdvice">
+                   <aop:around method="aroundMethod" pointcut-ref="jsrValidate"/>
+              </aop:aspect>
+       </aop:config>
+
+       <!--配置静态资源过滤器-->      
+       <!--<mvc:resources location="/image/" mapping="/image/**" />-->
+       <!--<mvc:resources location="/js/" mapping="/js/**" />-->
+       <mvc:default-servlet-handler/>
+
+       <!-- 配置拦截器 -->
+       <mvc:interceptors>
+              <!-- 使用bean定义一个Interceptor，直接定义在mvc:interceptors根下面的Interceptor将拦截所有的请求 ,配置了mvc:annotation-driven无法使用属性 -->
+              <bean class="com.jason.mealorder.interceptor.LoginInterceptor"/>
+              <!-- <mvc:interceptor>
+                  <mvc:mapping path="/"/>
+                                    定义在mvc:interceptor下面的表示是对特定的请求才进行拦截的
+                  <bean class="com.host.app.web.interceptor.LoginInterceptor"/>
+              </mvc:interceptor> -->
+       </mvc:interceptors>
+</beans>
