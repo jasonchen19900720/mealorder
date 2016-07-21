@@ -1,7 +1,7 @@
 
 function showCourse(dishName,imgSrc,attribution,price){	
 	var img = document.getElementById("img");
-	var src="/MealOrder/image/"+imgSrc;
+	var src="/MealOrder/image/"+attribution+"/"+imgSrc;
 	img.setAttribute("src", src);	
 	document.getElementById("input-goods-name").value=dishName;
 	document.getElementById("input-img-src").value=imgSrc;	
