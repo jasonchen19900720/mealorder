@@ -1,7 +1,5 @@
 package com.jason.mealorder.controller;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,9 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.jason.mealorder.common.SysConstant;
 import com.jason.mealorder.common.SysEnum.ResultCode;
 import com.jason.mealorder.entity.Dish;
+import com.jason.mealorder.respmodel.RespModel;
 import com.jason.mealorder.service.DishService;
 
 @Controller
@@ -47,12 +45,12 @@ public class MenuAction {
 			                     @PathVariable("imgSrc") String imgSrc,Model model){ 
 			
 		log.info("showDishDetail enter,attribution="+attribution+",imgSrc="+imgSrc);
-		Map<String,Object> resMap=dishService.obtainDishInfo(attribution,imgSrc);
-		if(ResultCode.ERROR.getCode().equals(resMap.get(SysConstant.CODE))){
+		RespModel respModel=dishService.obtainDishInfo(attribution,imgSrc);
+		if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){
 		    log.info("获取菜品详细信息发生错误");
 			return "error";
 		}else{
-			Dish dish=(Dish)resMap.get(SysConstant.DATA);
+			Dish dish=(Dish)respModel.getObjectData();
 			model.addAttribute("dish", dish);
 			return "courseDetail/courseDetail";
 		}		   

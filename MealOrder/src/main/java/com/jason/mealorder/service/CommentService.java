@@ -1,13 +1,13 @@
 package com.jason.mealorder.service;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.jason.mealorder.respmodel.RespModel;
+
 public interface CommentService {
 
-	public Map<String,Object> getAllComments(HttpServletRequest req,HttpServletResponse resp);
+	RespModel getAllComments(HttpServletRequest req,HttpServletResponse resp);
 	
-	public Map<String,Object> addComment(String comments,String orderId,HttpServletRequest req);
+	RespModel addComment(String comments,String orderId,HttpServletRequest req);
 }

@@ -1,18 +1,17 @@
 package com.jason.mealorder.service;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.jason.mealorder.entity.Order;
+import com.jason.mealorder.respmodel.RespModel;
 
 public interface OrderService {
 
-	Map<String, Object> submitOrder(HttpServletRequest req);
-	Map<String, Object> cancelOrder(Order order);
-	Map<String, Object> userOrders(HttpServletRequest req);
-	Map<String, Object> getCommentOrder(String orderId);
-	Map<String, Object> confirmReceived(String orderId);
+	RespModel submitOrder(HttpServletRequest req);
+	RespModel cancelOrder(Order order);
+	RespModel userOrders(HttpServletRequest req);
+	RespModel getCommentOrder(String orderId);
+	RespModel confirmReceived(String orderId);
 	//Map<String,Object> finishOrder(Order order);
 	//Map<String,Object> getAvailableOrder();
 	/*

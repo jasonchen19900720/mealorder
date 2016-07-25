@@ -59,9 +59,9 @@ public class SysEnum {
 	
     public enum OrderStatus {
 		
-	    WAITING("姝ｅ湪鍑洪"),DELIVERING("姝ｅ湪閫侀"),
-	    CANCELED("宸茬粡鍏抽棴"),DONE("浜ゆ槗鎴愬姛"),COMMENTED("宸茬粡璇勮"),
-	    EXPIRED("璁㈠崟杩囨湡");
+	    WAITING("正在出餐"),DELIVERING("正在送餐"),
+	    CANCELED("已经关闭"),DONE("交易成功"),COMMENTED("已经评论"),
+	    EXPIRED("订单过期");
 	    
 	    private String status;
 	    

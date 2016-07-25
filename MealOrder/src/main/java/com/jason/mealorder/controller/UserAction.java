@@ -1,7 +1,6 @@
 package com.jason.mealorder.controller;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -21,6 +20,7 @@ import com.jason.mealorder.common.SysConstant;
 import com.jason.mealorder.common.SysEnum.ResultCode;
 import com.jason.mealorder.common.SysEnum.ResultMsg;
 import com.jason.mealorder.entity.User;
+import com.jason.mealorder.respmodel.RespModel;
 import com.jason.mealorder.service.UserService;
 import com.jason.mealorder.viewmodel.RegisForm;
 
@@ -48,13 +48,12 @@ public class UserAction {
 				 model.addAttribute(fieldName+"Valid",validMsg);
 			 } catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
-			 }
-			
+			 }		
 		}  
 		log.info(regisForm.toString(regisForm));
-		Map<String,Object> map =userService.saveUser(regisForm);
-		if(ResultCode.ERROR.getCode().equals(map.get(SysConstant.CODE))){
-			log.info("注册失败");
+		RespModel respModel =userService.saveUser(regisForm);
+		if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){
+			log.error("注册失败");
 			return "error";
 		}else{
 		    log.info("注册成功！");	    
@@ -82,10 +81,10 @@ public class UserAction {
     @RequestMapping(value = "/login")
     public String login(RegisForm regisForm,Model model,HttpServletRequest request){
     	log.info(regisForm.toString(regisForm));
-    	Map<String,Object> resMap=userService.userLogin(regisForm, request);
-    	if(ResultCode.ERROR.getCode().equals(resMap.get(SysConstant.CODE))){
+    	RespModel respModel=userService.userLogin(regisForm, request);
+    	if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){
     		log.error("登录失败");	
-    		model.addAttribute("loginMsg", resMap.get(SysConstant.MSG));
+    		model.addAttribute("loginMsg", respModel.getResultMsg());
     		return "user/login";
     	}else{
     		log.info("登陆成功");    		
@@ -133,9 +132,9 @@ public class UserAction {
     @RequestMapping(value = "/validateEmail", produces = "application/json;charset=UTF-8")
     public String validateUserEmail(@RequestParam(value="email",required =true,defaultValue="")String email){
     	log.info("校验邮箱："+email);
-    	Map<String, Object> map = userService.validateUserEmail(email);
+    	RespModel respModel = userService.validateUserEmail(email);
     	
-    	if ("-1".equals(map.get(SysConstant.CODE))) {
+    	if (ResultCode.ERROR.getCode().equals(respModel.getResultCode())) {
             return "{\"valid\":false}";
         } else {
             return "{\"valid\":true}";
@@ -147,9 +146,9 @@ public class UserAction {
     @RequestMapping(value = "/validateName", produces = "application/json;charset=UTF-8")
     public String validateUserName(@RequestParam(value="name",required =true,defaultValue="")String name){
     	 log.info("校验名字："+name);
-    	 Map<String, Object> map = userService.validateUserName(name);
+    	 RespModel respModel = userService.validateUserName(name);
 
-         if ("-1".equals(map.get(SysConstant.CODE))) {
+         if (ResultCode.ERROR.getCode().equals(respModel.getResultCode())) {
         	 log.info("名字已被注册");
              return "{\"valid\":false}";
          } else {

@@ -3,9 +3,7 @@ package com.jason.mealorder.service;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +20,7 @@ import com.jason.mealorder.entity.Comment;
 import com.jason.mealorder.entity.User;
 import com.jason.mealorder.mapper.CommentMapper;
 import com.jason.mealorder.mapper.OrderMapper;
+import com.jason.mealorder.respmodel.RespModel;
 import com.jason.mealorder.viewmodel.CommentModel;
 
 @Service
@@ -32,7 +31,7 @@ public class CommentServiceImp implements CommentService {
 	private CommentMapper commentMapper;
 	@Autowired
 	private OrderMapper orderMapper;
-	public Map<String, Object> getAllComments(HttpServletRequest req,HttpServletResponse resp) {
+	public RespModel getAllComments(HttpServletRequest req,HttpServletResponse resp) {
 		log.info("开始加载评论信息");
 		try {
 			req.setCharacterEncoding("utf-8");
@@ -40,7 +39,7 @@ public class CommentServiceImp implements CommentService {
 			e1.printStackTrace();
 		}
 		resp.setContentType("text/html;charset=UTF-8");
-		Map<String,Object> map=new HashMap<String, Object>();	
+		RespModel respModel = new RespModel();	
 		try {
 			log.info("加载评论for"+req.getParameter("dishName"));
 			List<Comment> list=commentMapper.getCommentsByDishName(req.getParameter("dishName"));
@@ -54,30 +53,30 @@ public class CommentServiceImp implements CommentService {
 				comment.setAddTime(c.getAddTime().toString().substring(0, 16));
 				dataList.add(comment);
 			}
-			map.put(SysConstant.DATA, JsonUtil.listToJsonStr(dataList));
-			map.put(SysConstant.CODE, ResultCode.OK.getCode());
+			respModel.setJsonStrData(JsonUtil.listToJsonStr(dataList));
+			respModel.setResultCode(ResultCode.OK.getCode());
 		} catch (Exception e) {
-			map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
-			log.info("加载评论信息失败");
+			respModel.setResultCode(ResultCode.ERROR.getCode());
+			log.error("加载评论信息失败");
 		}
-		return map;
+		return respModel;
 	}
 
-	public Map<String, Object> addComment(String comments,String orderId,HttpServletRequest req) {
+	public RespModel addComment(String comments,String orderId,HttpServletRequest req) {
 		log.info("发表评论信息");
-		Map<String,Object> map=new HashMap<String, Object>();
+		RespModel respModel = new RespModel();
 		User curUser=(User)req.getSession().getAttribute(SysConstant.CURRENT_USER);
 		if(curUser==null){
 			log.info("用户未登录或登录超时");	
-			map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
-			return map;
+			respModel.setResultCode(ResultCode.ERROR.getCode());
+			return respModel;
 		}else{		
 			try {
 				String orderStatus=orderMapper.getOrderStatusById(orderId);
 				if(OrderStatus.COMMENTED.getStatus().equals(orderStatus)){
 					log.info("已经评论过了");
-					map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
-					return map;
+					respModel.setResultCode(ResultCode.ERROR.getCode());
+					return respModel;
 				}
 				List<Comment> list=JsonUtil.jsonStrToList(comments, Comment.class);
 				for(Comment comment:list){		
@@ -93,14 +92,14 @@ public class CommentServiceImp implements CommentService {
 				   commentMapper.addCommentForDish(comment);
 				}
 				orderMapper.updateOrderStatus(OrderStatus.COMMENTED.getStatus(), orderId);
-				map.put(SysConstant.CODE, ResultCode.OK.getCode());
+				respModel.setResultCode(ResultCode.OK.getCode());
 				log.info("发表评论成功");
 			} catch (Exception e) {
 				e.printStackTrace();
-				map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
-				log.info("发表评论失败");
+				respModel.setResultCode(ResultCode.ERROR.getCode());
+				log.error("发表评论失败");
 			}			
 		}		
-		return map;
+		return respModel;
 	}
 }

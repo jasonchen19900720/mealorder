@@ -2,9 +2,7 @@ package com.jason.mealorder.service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -21,6 +19,7 @@ import com.jason.mealorder.entity.Order;
 import com.jason.mealorder.entity.User;
 import com.jason.mealorder.mapper.OrderMapper;
 import com.jason.mealorder.mapper.SCarItemMapper;
+import com.jason.mealorder.respmodel.RespModel;
 import com.jason.mealorder.viewmodel.GoodsItem;
 import com.jason.mealorder.viewmodel.OrderModel;
 
@@ -32,13 +31,13 @@ public class OrderServiceImp implements OrderService {
 	@Autowired
 	private SCarItemMapper sCarItemMapper;
 	private Logger log = Logger.getLogger(OrderServiceImp.class);
-	public Map<String, Object> submitOrder(HttpServletRequest req) {
-		Map<String,Object> map= new HashMap<String, Object>();	
-		map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
+	public RespModel submitOrder(HttpServletRequest req) {
+		RespModel respModel = new RespModel();	
+		respModel.setResultCode(ResultCode.ERROR.getCode());
 		User curUser=(User)req.getSession().getAttribute(SysConstant.CURRENT_USER);
 		if(curUser==null){
 			log.info("用户未登录或登录超时");		
-			return map;
+			return respModel;
 		}
 	    try{				
 			 String orderInfo=req.getParameter("orderInfo");
@@ -61,27 +60,27 @@ public class OrderServiceImp implements OrderService {
 		     log.info("orderInfo="+order.getOrderInfo());		    
 		     orderMapper.saveOrder(order);	
 		     sCarItemMapper.clearSCar(curUser.getUserUuid());
-		     map.put(SysConstant.CODE, ResultCode.OK.getCode());
+		     respModel.setResultCode(ResultCode.OK.getCode());
 		}catch(Exception e){
 			 e.printStackTrace();
 			 log.error("保存订单发生异常");
-			 map.put(SysConstant.CODE, ResultCode.ERROR.getCode());		
+			 respModel.setResultCode(ResultCode.ERROR.getCode());		
 		}
-		return map;
+		return respModel;
 	}
 
-	public Map<String, Object> cancelOrder(Order order) {
+	public RespModel cancelOrder(Order order) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Map<String, Object> userOrders(HttpServletRequest req) {
-		Map<String,Object> map= new HashMap<String, Object>();
-		map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
+	public RespModel userOrders(HttpServletRequest req) {
+		RespModel respModel = new RespModel();
+		respModel.setResultCode(ResultCode.ERROR.getCode());
 		User curUser=(User)req.getSession().getAttribute(SysConstant.CURRENT_USER);
 		if(curUser==null){
 			log.info("用户未登录或登录超时");		
-			return map;
+			return respModel;
 		}else{
 			try {
 				List<Order> list=orderMapper.getUserOrders(curUser.getName());
@@ -90,46 +89,47 @@ public class OrderServiceImp implements OrderService {
 					OrderModel orderModel = new OrderModel(o);
 					dataList.add(orderModel);
 				}
-				map.put(SysConstant.CODE, ResultCode.OK.getCode());
-				map.put(SysConstant.DATA, dataList);//JsonUtil.listToJsonStr(dataList)
+				respModel.setResultCode(ResultCode.OK.getCode());
+				respModel.setListData(dataList);
+				//JsonUtil.listToJsonStr(dataList)
 			} catch (Exception e) {
 				e.printStackTrace();
-				map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
+				respModel.setResultCode(ResultCode.ERROR.getCode());
 			}
 		}
-		return map;
+		return respModel;
 	}
 	
-	public Map<String, Object> getCommentOrder(String orderId){
-		Map<String,Object> map= new HashMap<String, Object>();
+	public RespModel getCommentOrder(String orderId){
+		RespModel respModel = new RespModel();
 		try {
 			Order order=orderMapper.getOrderById(orderId);
 			OrderModel orderModel = new OrderModel(order);
-			map.put(SysConstant.DATA, orderModel);
-			map.put(SysConstant.CODE, ResultCode.OK.getCode());
+			respModel.setObjectData(orderModel);
+			respModel.setResultCode(ResultCode.OK.getCode());
 		} catch (Exception e) {
 			e.printStackTrace();
-			map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
+			respModel.setResultCode(ResultCode.ERROR.getCode());
 		}
-		return map;
+		return respModel;
 	}
 
-	public Map<String, Object> confirmReceived(String orderId) {
-		Map<String,Object> map= new HashMap<String, Object>();
+	public RespModel confirmReceived(String orderId) {
+		RespModel respModel = new RespModel();
 		try {		
 			String status=orderMapper.getOrderStatusById(orderId);
 			log.info(status);
 			if(OrderStatus.DONE.getStatus().equals(status)){
-				map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
-				return map;
+				respModel.setResultCode(ResultCode.ERROR.getCode());
+				return respModel;
 			}			
 			orderMapper.updateOrderStatus(OrderStatus.DONE.getStatus(),orderId);
-			map.put(SysConstant.CODE, ResultCode.OK.getCode());
+			respModel.setResultCode(ResultCode.OK.getCode());
 		} catch (Exception e) {
 			e.printStackTrace();
-			map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
+			respModel.setResultCode(ResultCode.ERROR.getCode());
 		}
-		return map;
+		return respModel;
 	}
 	
 	

@@ -31,7 +31,6 @@ CREATE TABLE `order` (
 CREATE TABLE `sCarItem` (
   `id` int NOT NULL auto_increment,
   `userUuid` varchar(32) NOT NULL,   
-  `phoneNum` varchar(16) NOT NULL,
   `goodsName` varchar(32) NOT NULL,
   `amount` int(8) NOT NULL,
   `price`int(8) NOT NULL,

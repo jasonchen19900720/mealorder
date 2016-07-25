@@ -1,7 +1,6 @@
 package com.jason.mealorder.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.jason.mealorder.common.SysConstant;
 import com.jason.mealorder.common.SysEnum.ResultCode;
+import com.jason.mealorder.respmodel.RespModel;
 import com.jason.mealorder.service.OrderService;
 import com.jason.mealorder.viewmodel.OrderModel;
 
@@ -33,9 +32,9 @@ public class OrderAction {
 	@RequestMapping(value="/submitOrder")
 	public String submitOrder(HttpServletRequest req){
 		log.info("提交订单");			
-		Map<String, Object> map = orderService.submitOrder(req);
+		RespModel respModel = orderService.submitOrder(req);
 		
-		if(ResultCode.ERROR.getCode().equals(map.get(SysConstant.CODE))){
+		if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){
 			log.info("提交订单发生错误");
 			return "{\"submitOrder\":\"error\"}";
 			
@@ -49,28 +48,28 @@ public class OrderAction {
 	@RequestMapping(value="/myOrders" )
 	public String userOrders(Model model,HttpServletRequest req){
 		log.info("显示我的订单");
-		Map<String,Object> resMap=orderService.userOrders(req);
-		if(ResultCode.ERROR.getCode().equals(resMap.get(SysConstant.CODE))){
+		RespModel respModel=orderService.userOrders(req);
+		if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){
 			log.info("加载我的订单异常");
 			return "error";
 		}else{
 			log.info("加载我的订单成功");
-			List<OrderModel> dataList=(List<OrderModel>)resMap.get(SysConstant.DATA);
+			List<OrderModel> dataList=(List<OrderModel>)respModel.getListData();
 			model.addAttribute("orders", dataList);
 			return "order/userOrders";
 		}
 	}
 	
 	@RequestMapping(value="/toComment")
-	public String toComment(@RequestParam String orderId,Model model){
+	public String toComment(@RequestParam String orderId, Model model){
 		log.info("我要去评价");
-		Map<String,Object> resMap=orderService.getCommentOrder(orderId);
-		if(ResultCode.ERROR.getCode().equals(resMap.get(SysConstant.CODE))){
+		RespModel respModel=orderService.getCommentOrder(orderId);
+		if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){
 			log.info("加载评论订单异常");
 			return "error";
 		}else{
 			log.info("加载评论订单成功");
-			OrderModel orderModel=(OrderModel)resMap.get(SysConstant.DATA);
+			OrderModel orderModel=(OrderModel)respModel.getObjectData();
 			model.addAttribute("orderModel", orderModel);
 			return "order/addComment";
 		}	
@@ -79,8 +78,8 @@ public class OrderAction {
 	@RequestMapping(value="received")
 	public String confirmDeliver(@RequestParam String orderId,Model model,HttpServletRequest req){
 		log.info("确认收到订餐");
-		Map<String,Object> resMap=orderService.confirmReceived(orderId);
-		if(ResultCode.ERROR.getCode().equals(resMap.get(SysConstant.CODE))){
+		RespModel respModel=orderService.confirmReceived(orderId);
+		if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){
 			model.addAttribute("resultMsg", "签收异常，可能您已经确认签收过了！");
 			return "result/error";
 		}else{

@@ -1,7 +1,5 @@
 package com.jason.mealorder.controller;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.jason.mealorder.common.SysConstant;
 import com.jason.mealorder.common.SysEnum.ResultCode;
+import com.jason.mealorder.respmodel.RespModel;
 import com.jason.mealorder.service.CommentService;
 
 @Controller
@@ -30,15 +28,15 @@ public class CommentAction {
 	@ResponseBody
     public String showComments(HttpServletRequest req,HttpServletResponse resp){ 
 		log.info("加载评论");
-    	Map<String,Object> resMap=commentService.getAllComments(req,resp);   	
-    	if(ResultCode.ERROR.getCode().equals(resMap.get(SysConstant.CODE))){ 
+    	RespModel respModel=commentService.getAllComments(req,resp);   	
+    	if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){ 
     		log.info("加载评论异常");  		
     		return "{\"showComments\":\"error\"}";
     	}else{
     		 
     		log.info("加载评论成功");
-    		log.info(resMap.get(SysConstant.DATA).toString());
-    		return resMap.get(SysConstant.DATA).toString();
+    		log.info(respModel.getJsonStrData());
+    		return respModel.getJsonStrData();
     	}   	
     }
 	
@@ -47,8 +45,8 @@ public class CommentAction {
 			                                                 Model model,HttpServletRequest req){	
 		log.info("发表评论");
 		log.info(orderId);
-		Map<String,Object> resMap=commentService.addComment(comments,orderId,req);
-		if(ResultCode.ERROR.getCode().equals(resMap.get(SysConstant.CODE))){
+		RespModel respModel=commentService.addComment(comments,orderId,req);
+		if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){
 			model.addAttribute("resultMsg", "发表评论失败");
 			return "result/error";
 		}else{

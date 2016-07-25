@@ -1,16 +1,13 @@
 package com.jason.mealorder.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.jason.mealorder.common.SysConstant;
 import com.jason.mealorder.common.SysEnum.ResultCode;
 import com.jason.mealorder.entity.Dish;
 import com.jason.mealorder.mapper.DishMapper;
+import com.jason.mealorder.respmodel.RespModel;
 
 @Service
 public class DishServiceImp implements DishService {
@@ -19,24 +16,24 @@ public class DishServiceImp implements DishService {
 	
 	@Autowired
 	private DishMapper dishMapper;
-	public Map<String, Object> obtainDishInfo(String attribution,String imgSrc) {
+	public RespModel obtainDishInfo(String attribution,String imgSrc) {
 		log.info("获取菜品详情");
-		Map<String, Object> map=new HashMap<String, Object>();
+		RespModel respModel = new RespModel();
 		try {		
 			Dish dish= dishMapper.getDish(attribution,imgSrc);
 			if(dish!=null){
 				log.info(dish.getDishName()+","+dish.getPrice()+","+dish.getImgSrc());
-				map.put(SysConstant.CODE, ResultCode.OK.getCode());	
-				map.put(SysConstant.DATA,dish);
+				respModel.setResultCode(ResultCode.OK.getCode());	
+				respModel.setObjectData(dish);
 			}else{
-				map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
+				respModel.setResultCode(ResultCode.ERROR.getCode());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.info("获取菜品详情发生异常");
-			map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
+			log.error("获取菜品详情发生异常");
+			respModel.setResultCode(ResultCode.ERROR.getCode());
 		}
-		return map;
+		return respModel;
 	}
 
 }

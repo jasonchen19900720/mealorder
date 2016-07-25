@@ -1,8 +1,8 @@
 package com.jason.mealorder.service;
 
-import java.util.Map;
+import com.jason.mealorder.respmodel.RespModel;
 
 public interface DishService {
 
-	public Map<String,Object> obtainDishInfo(String attribution,String imgSrc);
+	RespModel obtainDishInfo(String attribution,String imgSrc);
 }

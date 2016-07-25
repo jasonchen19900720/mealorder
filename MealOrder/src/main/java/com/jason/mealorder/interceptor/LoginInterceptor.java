@@ -75,7 +75,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     		User user=(User)req.getSession().getAttribute(SysConstant.CURRENT_USER);
     		if(null==user){
     			log.info("未登录或登录超时");  			   			
-    			System.out.println(req.getContextPath());
+    			log.info(req.getContextPath());
     			/*
     			OutputStream outputStream = resp.getOutputStream();    			
     			String data="loginMsg=login timeout";

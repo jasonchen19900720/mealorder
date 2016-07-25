@@ -1,9 +1,7 @@
 package com.jason.mealorder.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +16,7 @@ import com.jason.mealorder.common.SysEnum.ResultMsg;
 import com.jason.mealorder.entity.SCarItem;
 import com.jason.mealorder.entity.User;
 import com.jason.mealorder.mapper.SCarItemMapper;
+import com.jason.mealorder.respmodel.RespModel;
 import com.jason.mealorder.viewmodel.GoodsItem;
 
 @Service
@@ -26,9 +25,9 @@ public class SCarServiceImp implements SCarService {
 	private static Logger log = Logger.getLogger(SCarServiceImp.class);
 	@Autowired
 	private SCarItemMapper sCarItemMapper;	
-	public Map<String, Object> addGoods(GoodsItem goodsItem,HttpServletRequest req) {	
+	public RespModel addGoods(GoodsItem goodsItem,HttpServletRequest req) {	
 		log.info("addGoods enter");	
-		Map<String,Object> map =new HashMap<String, Object>();
+		RespModel respModel =new RespModel();
 		/*
 		String cookieValue=JsonUtil.objectToJsonStr(goodsItem);
 		String cookieName=goodsItem.getGoodsName()+"-shoppingCar";		
@@ -54,20 +53,20 @@ public class SCarServiceImp implements SCarService {
 		log.info("user is "+user);
 		if(null==user){
 			log.info("用户未登录或登陆超时");
-			map.put(SysConstant.CODE, ResultCode.ERROR.getCode());			
+			respModel.setResultCode(ResultCode.ERROR.getCode());			
 		}else{	
 			SCarItem oldSCarItem= sCarItemMapper.getSCarItem(user.getUserUuid(), goodsItem.getGoodsName());
 			if(null!=oldSCarItem){
 				try {
 					sCarItemMapper.modifySCarItem( oldSCarItem.getAmount()+goodsItem.getAmount(),user.getUserUuid(),goodsItem.getGoodsName());    
-					map.put(SysConstant.CODE, ResultCode.OK.getCode());
-					map.put(SysConstant.MSG, ResultMsg.MODIFY_AMOUNT_SUCC.getMsg());
+					respModel.setResultCode(ResultCode.OK.getCode());
+					respModel.setResultMsg(ResultMsg.MODIFY_AMOUNT_SUCC.getMsg());
 					log.info("添加商品-更新物品数目成功");
 					
 				} catch (Exception e) {
 					e.printStackTrace();
-					map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
-					map.put(SysConstant.MSG, ResultMsg.MODIFY_AMOUNT_ERROR.getMsg());
+					respModel.setResultCode(ResultCode.ERROR.getCode());
+					respModel.setResultMsg(ResultMsg.MODIFY_AMOUNT_ERROR.getMsg());
 				}
 			}else{
 				
@@ -80,60 +79,60 @@ public class SCarServiceImp implements SCarService {
 				sCarItem.setAttribution(goodsItem.getAttribution());
 				try {
 					sCarItemMapper.addSCarItem(sCarItem);
-					map.put(SysConstant.CODE, ResultCode.OK.getCode());
-				    map.put(SysConstant.MSG, ResultMsg.ADD_GOODS_SUCC.getMsg());
+					respModel.setResultCode(ResultCode.OK.getCode());
+					respModel.setResultMsg(ResultMsg.ADD_GOODS_SUCC.getMsg());				   
 				    log.info("新添加商品成功");
 				} catch (Exception e) {
 					e.printStackTrace();
-					map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
-				    map.put(SysConstant.MSG, ResultMsg.ADD_GOODS_ERROR.getMsg());
+					respModel.setResultCode(ResultCode.ERROR.getCode());
+					respModel.setResultMsg(ResultMsg.ADD_GOODS_ERROR.getMsg());
 				}
 			    
 			}
 			
 		}
-		return map;
+		return respModel;
 	}
 
-	public Map<String, Object> removeGoods(String goodsName,HttpServletRequest req) {
+	public RespModel removeGoods(String goodsName,HttpServletRequest req) {
 		log.info("removeGoods enter");	
-		Map<String,Object> map =new HashMap<String, Object>();
+		RespModel respModel =new RespModel();
 		User user=(User)req.getSession().getAttribute(SysConstant.CURRENT_USER);		
 		if(null==user){
 			log.info("用户未登录或登陆超时");
-			map.put(SysConstant.CODE, ResultCode.ERROR.getCode());			
+			respModel.setResultCode(ResultCode.ERROR.getCode());			
 		}else{
 			try {			
 				sCarItemMapper.deleteSCarItem(user.getUserUuid(), goodsName);
-				map.put(SysConstant.CODE, ResultCode.OK.getCode());
-			    map.put(SysConstant.MSG, ResultMsg.DEL_GOODS_SUCC.getMsg());
+				respModel.setResultCode(ResultCode.OK.getCode());
+				respModel.setResultMsg(ResultMsg.DEL_GOODS_SUCC.getMsg());
 			} catch (Exception e) {
 				e.printStackTrace();
-				map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
-			    map.put(SysConstant.MSG, ResultMsg.DEL_GOODS_ERROR.getMsg());
+				respModel.setResultCode(ResultCode.ERROR.getCode());
+				respModel.setResultMsg(ResultMsg.DEL_GOODS_ERROR.getMsg());
 			}
 		}	
-		return map;
+		return respModel;
 	}
 
-	public Map<String, Object> modifyGoods(GoodsItem goodsItem,HttpServletRequest req,HttpServletResponse resp) {
+	public RespModel modifyGoods(GoodsItem goodsItem,HttpServletRequest req,HttpServletResponse resp) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Map<String, Object> showSCar(HttpServletRequest req) {
-		Map<String,Object> map =new HashMap<String, Object>();
+	public RespModel showSCar(HttpServletRequest req) {
+		RespModel respModel =new RespModel();
 		User user=(User)req.getSession().getAttribute(SysConstant.CURRENT_USER);
 		if(null==user){
 			log.info("用户未登录或登陆超时");
-			map.put(SysConstant.CODE, ResultCode.ERROR.getCode());			
+			respModel.setResultCode(ResultCode.ERROR.getCode());			
 		}else{	
 			try {
 				List<SCarItem> list=sCarItemMapper.getSCarAllItems(user.getUserUuid());
 				if(null==list||list.isEmpty()){
 					log.info("购物车没有物品");
-					map.put(SysConstant.CODE, ResultCode.OK.getCode());
-					map.put(SysConstant.MSG, ResultMsg.GET_SCAR_EMPTY.getMsg());				
+					respModel.setResultCode(ResultCode.OK.getCode());
+					respModel.setResultMsg(ResultMsg.GET_SCAR_EMPTY.getMsg());
 				}else{		
 					List<GoodsItem> dataList=new ArrayList<GoodsItem>();
 					Integer pprice = 0;
@@ -147,18 +146,18 @@ public class SCarServiceImp implements SCarService {
 						pprice+=item.getAmount()*item.getPrice();
 						dataList.add(goodsItem);
 					}
-					map.put(SysConstant.DATA, dataList);
-					map.put("totalPrice", pprice);
-					map.put(SysConstant.CODE, ResultCode.OK.getCode());
-					map.put(SysConstant.MSG, ResultMsg.GET_SCAR_SUCC.getMsg());
+					respModel.setListData(dataList);
+					respModel.setNumberData(pprice);
+					respModel.setResultCode(ResultCode.OK.getCode());
+					respModel.setResultMsg(ResultMsg.GET_SCAR_SUCC.getMsg());
 				}				
 			} catch (Exception e) {
 				log.info("查询购物车出错");
 				e.printStackTrace();
-				map.put(SysConstant.CODE, ResultCode.ERROR.getCode());
-				map.put(SysConstant.MSG, ResultMsg.GET_SCAR_ERROR.getMsg());
+				respModel.setResultCode(ResultCode.ERROR.getCode());
+				respModel.setResultMsg(ResultMsg.GET_SCAR_ERROR.getMsg());
 			}			
 		}
-		return map;
+		return respModel;
 	}	
 }

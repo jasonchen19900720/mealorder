@@ -1,7 +1,6 @@
 package com.jason.mealorder.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.jason.mealorder.common.SysConstant;
 import com.jason.mealorder.common.SysEnum.ResultCode;
 import com.jason.mealorder.common.SysEnum.ResultMsg;
+import com.jason.mealorder.respmodel.RespModel;
 import com.jason.mealorder.service.SCarService;
 import com.jason.mealorder.viewmodel.GoodsItem;
 
@@ -36,9 +35,9 @@ public class SCarAction {
 		log.info("菜名："+item.getGoodsName());
 		log.info("价格："+item.getPrice());
 		log.info("归属："+item.getAttribution());
-		Map<String,Object> resMap=sCarService.addGoods(item, req);
-		if(ResultCode.ERROR.getCode().equals(resMap.get(SysConstant.CODE))){
-			log.error("添加购物车异常："+resMap.get(SysConstant.MSG));							
+		RespModel respModel=sCarService.addGoods(item, req);
+		if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){
+			log.error("添加购物车异常："+respModel.getResultMsg());							
 			return "error";										
 		}else{
 			log.info("添加购物车成功");
@@ -51,19 +50,19 @@ public class SCarAction {
 	@RequestMapping(value="/myShoppingCar")
 	public String showSCarDetail(Model model,HttpServletRequest req){	
 		log.info("进入加载购物车信息");			
-		Map<String, Object> resMap = sCarService.showSCar(req);
-		if(ResultCode.ERROR.getCode().equals(resMap.get(SysConstant.CODE))){
-			log.error("获取购物车信息失败："+resMap.get(SysConstant.MSG));						
+		RespModel respModel = sCarService.showSCar(req);
+		if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){
+			log.error("获取购物车信息失败："+respModel.getResultMsg());						
 			model.addAttribute("resultMsg", "error");			
 		}else{
 			log.info("获取购物车信息成功");
 			model.addAttribute("resultMsg", "error");
-			if(ResultMsg.GET_SCAR_EMPTY.getMsg().equals(resMap.get(SysConstant.MSG))){
+			if(ResultMsg.GET_SCAR_EMPTY.getMsg().equals(respModel.getResultMsg())){
 				log.info("购物车没有物品");
 				model.addAttribute("scarItems", "EMPTY");			
 			}else{
-				List<GoodsItem> dataList=(List<GoodsItem>)resMap.get(SysConstant.DATA);
-				Integer totalPrice=(Integer)resMap.get("totalPrice");
+				List<GoodsItem> dataList=(List<GoodsItem>)respModel.getListData();
+				Integer totalPrice=(Integer)respModel.getNumberData();
 				model.addAttribute("scarItems", dataList);
 				model.addAttribute("totalPrice", totalPrice);
 			}			
@@ -75,9 +74,9 @@ public class SCarAction {
 	public String delSCarItem(@RequestParam(value="goodsName",required =true) String goodsName,
 			                                                 HttpServletRequest req){
 		log.info("进入移除购物车项");
-		Map<String, Object> resMap = sCarService.removeGoods(goodsName, req);
-		if(ResultCode.ERROR.getCode().equals(resMap.get(SysConstant.CODE))){
-			log.error("移除购物车项异常："+resMap.get(SysConstant.MSG));							
+		RespModel respModel = sCarService.removeGoods(goodsName, req);
+		if(ResultCode.ERROR.getCode().equals(respModel.getResultCode())){
+			log.error("移除购物车项异常："+respModel.getResultMsg());							
 			return "error";								
 		}else{
 			log.info("移除购物车项成功");
